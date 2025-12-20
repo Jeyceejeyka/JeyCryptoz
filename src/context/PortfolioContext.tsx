@@ -38,11 +38,11 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }
   };
 
   const removeFromPortfolio = (coinId: string) => {
-    setPortfolio(portfolio.filter(item => item.coinId !== coinId));
+    setPortfolio((Array.isArray(portfolio) ? portfolio : []).filter(item => item.coinId !== coinId));
   };
 
   const updatePortfolioItem = (coinId: string, updates: Partial<PortfolioItem>) => {
-    setPortfolio(portfolio.map(item => 
+    setPortfolio((Array.isArray(portfolio) ? portfolio : []).map(item => 
       item.coinId === coinId ? { ...item, ...updates } : item
     ));
   };

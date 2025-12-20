@@ -136,7 +136,7 @@ const Portfolio: React.FC = () => {
     if (selectedItems.size === portfolio.length) {
       setSelectedItems(new Set());
     } else {
-      setSelectedItems(new Set(portfolio.map(item => item.coinId)));
+      setSelectedItems(new Set((Array.isArray(portfolio) ? portfolio : []).map(item => item.coinId)));
     }
   };
 
@@ -175,7 +175,7 @@ const Portfolio: React.FC = () => {
   // Calculate asset allocation
   const assetAllocation = useMemo(() => {
     const totalValue = calculatePortfolioValue();
-    return portfolio.map(item => {
+    return (Array.isArray(portfolio) ? portfolio : []).map(item => {
       const currentPrice = currentPrices[item.coinId]?.current_price || 0;
       const value = item.amount * currentPrice;
       return {
@@ -190,11 +190,11 @@ const Portfolio: React.FC = () => {
 
   // Filter and sort portfolio items
   const filteredAndSortedPortfolio = useMemo(() => {
-    let filtered = portfolio;
+    let filtered = Array.isArray(portfolio) ? portfolio : [];
 
     // Apply search filter
     if (searchQuery) {
-      filtered = portfolio.filter(item =>
+      filtered = (Array.isArray(portfolio) ? portfolio : []).filter(item =>
         item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.symbol.toLowerCase().includes(searchQuery.toLowerCase())
       );
@@ -282,7 +282,7 @@ const Portfolio: React.FC = () => {
   const handleExportCSV = () => {
     const csvContent = [
       ['Coin', 'Symbol', 'Amount', 'Avg Purchase Price', 'Current Price', 'Current Value', 'P&L', 'P&L %'],
-      ...portfolio.map(item => {
+      ...(Array.isArray(portfolio) ? portfolio : []).map(item => {
         const currentPrice = currentPrices[item.coinId]?.current_price || 0;
         const currentValue = item.amount * currentPrice;
         const pnl = currentValue - (item.amount * item.purchasePrice);
@@ -714,6 +714,7 @@ const Portfolio: React.FC = () => {
                 {/* Table Body */}
                 <div className="divide-y divide-white/10 dark:divide-gray-700/10">
                   {filteredAndSortedPortfolio.map((item, index) => {
+                    // Defensive: filteredAndSortedPortfolio is always array, but fallback for safety
                     const currentCoin = currentPrices[item.coinId];
                     const currentPrice = currentCoin?.current_price || 0;
                     const currentValue = item.amount * currentPrice;

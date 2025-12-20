@@ -22,11 +22,11 @@ const Market: React.FC = () => {
   };
 
   const filteredAndSortedCoins = useMemo(() => {
-    let filtered = coins;
+    let filtered = Array.isArray(coins) ? coins : [];
 
     // Apply search filter
     if (searchQuery) {
-      filtered = coins.filter(
+      filtered = (Array.isArray(coins) ? coins : []).filter(
         (coin) =>
           coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
           coin.symbol.toLowerCase().includes(searchQuery.toLowerCase())
@@ -194,7 +194,7 @@ const Market: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
         >
-          {filteredAndSortedCoins.map((coin, index) => (
+          {(Array.isArray(filteredAndSortedCoins) ? filteredAndSortedCoins : []).map((coin, index) => (
             <CoinCard key={coin.id} coin={coin} index={index} />
           ))}
         </motion.div>

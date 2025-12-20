@@ -159,7 +159,7 @@ const Home: React.FC = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {topCoins.map((coin, index) => (
+            {(Array.isArray(topCoins) ? topCoins : []).map((coin, index) => (
               <motion.div
                 key={coin.id}
                 initial={{ opacity: 0, y: 20 }}
@@ -215,7 +215,7 @@ const Home: React.FC = () => {
                 Top Gainers (24h)
               </h3>
               <div className="space-y-4">
-                {gainers.map((coin) => (
+                {(Array.isArray(gainers) ? gainers : []).map((coin) => (
                   <Link
                     key={coin.id}
                     to={`/coin/${coin.id}`}
@@ -252,7 +252,7 @@ const Home: React.FC = () => {
                 Top Losers (24h)
               </h3>
               <div className="space-y-4">
-                {losers.map((coin) => (
+                {(Array.isArray(losers) ? losers : []).map((coin) => (
                   <Link
                     key={coin.id}
                     to={`/coin/${coin.id}`}

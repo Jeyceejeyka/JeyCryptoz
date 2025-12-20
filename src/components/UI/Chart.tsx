@@ -20,7 +20,7 @@ interface ChartProps {
 }
 
 const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
-  const chartData = data.prices.map(([timestamp, price]) => ({
+  const chartData = (Array.isArray(data.prices) ? data.prices : []).map(([timestamp, price]) => ({
     time: timestamp,
     price: price,
     date: new Date(timestamp).toLocaleDateString(),
@@ -28,7 +28,7 @@ const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
   }));
 
   // Calculate min and max for better visualization
-  const prices = chartData.map(d => d.price);
+  const prices = (Array.isArray(chartData) ? chartData : []).map(d => d.price);
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const priceRange = maxPrice - minPrice;

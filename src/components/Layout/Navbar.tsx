@@ -33,7 +33,7 @@ const Navbar: React.FC = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => (
+            {(Array.isArray(navItems) ? navItems : []).map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
@@ -92,7 +92,7 @@ const Navbar: React.FC = () => {
           className="md:hidden overflow-hidden"
         >
           <div className="py-4 space-y-2">
-            {navItems.map((item) => (
+            {(Array.isArray(navItems) ? navItems : []).map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
