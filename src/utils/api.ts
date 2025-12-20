@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Coin, CoinDetail, PriceData } from '../types';
 
-const BASE_URL = 'https://api.coingecko.com/api/v3';
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const api = axios.create({
   baseURL: BASE_URL,
@@ -12,7 +12,7 @@ export const fetchCoins = async (page = 1, perPage = 100): Promise<Coin[]> => {
     const response = await api.get('/coins/markets', {
       params: {
         vs_currency: 'usd',
-        order: 'market_cap_desc',
+        order: 'gecko_desc',
         per_page: perPage,
         page,
         sparkline: true,

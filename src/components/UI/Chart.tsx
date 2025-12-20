@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Area,
   AreaChart,
+  ReferenceLine,
 } from 'recharts';
 import { PriceData } from '../../types';
 import { formatCurrency } from '../../utils/formatters';
@@ -26,6 +27,12 @@ const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
     formattedDate: new Date(timestamp).toLocaleString(),
   }));
 
+  // Calculate min and max for better visualization
+  const prices = chartData.map(d => d.price);
+  const minPrice = Math.min(...prices);
+  const maxPrice = Math.max(...prices);
+  const priceRange = maxPrice - minPrice;
+
   const formatXAxis = (tickItem: number) => {
     const date = new Date(tickItem);
     if (days <= 1) {
@@ -43,7 +50,7 @@ const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg p-3 rounded-lg border border-white/20 dark:border-gray-700/20"
+          className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-lg p-3 rounded-lg border border-gray-300 dark:border-gray-700 shadow-lg"
         >
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {new Date(label).toLocaleString()}
@@ -57,6 +64,36 @@ const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
     return null;
   };
 
+  // Custom dot component that always returns an element
+  const CustomDot = (props: any) => {
+    const { cx, cy, index } = props;
+    
+    // Show dots only for every 5th point to avoid clutter
+    if (index % 5 !== 0) {
+      return (
+        <circle
+          cx={cx}
+          cy={cy}
+          r={0}
+          fill="transparent"
+          stroke="transparent"
+          strokeWidth={0}
+        />
+      );
+    }
+    
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={2}
+        fill="#FFFFFF"
+        stroke={isPositive ? "#059669" : "#DC2626"}
+        strokeWidth={1.5}
+      />
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -67,42 +104,108 @@ const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={chartData}>
           <defs>
-            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+            {/* Sharp gradient for clear definition */}
+            <linearGradient id="sharpGradient" x1="0" y1="0" x2="0" y2="1">
               <stop
-                offset="5%"
-                stopColor={isPositive ? "#10B981" : "#EF4444"}
-                stopOpacity={0.3}
+                offset="0%"
+                stopColor={isPositive ? "#059669" : "#DC2626"}
+                stopOpacity={0.8}
               />
               <stop
-                offset="95%"
-                stopColor={isPositive ? "#10B981" : "#EF4444"}
-                stopOpacity={0}
+                offset="50%"
+                stopColor={isPositive ? "#059669" : "#DC2626"}
+                stopOpacity={0.4}
+              />
+              <stop
+                offset="100%"
+                stopColor={isPositive ? "#059669" : "#DC2626"}
+                stopOpacity={0.1}
               />
             </linearGradient>
           </defs>
-          <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+          
+          {/* Grid with subtle lines */}
+          <CartesianGrid 
+            strokeDasharray="1 1" 
+            stroke="rgba(156, 163, 175, 0.2)" 
+            vertical={false}
+          />
+          
+          {/* X Axis with better styling */}
           <XAxis
             dataKey="time"
             tickFormatter={formatXAxis}
-            axisLine={false}
+            axisLine={{ stroke: 'rgba(156, 163, 175, 0.5)' }}
             tickLine={false}
-            tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+            tick={{ fill: 'rgba(107, 114, 128, 0.9)', fontSize: 11, fontWeight: 500 }}
+            padding={{ left: 10, right: 10 }}
           />
+          
+          {/* Y Axis with better styling */}
           <YAxis
             tickFormatter={(value) => formatCurrency(value)}
-            axisLine={false}
+            axisLine={{ stroke: 'rgba(156, 163, 175, 0.5)' }}
             tickLine={false}
-            tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+            tick={{ fill: 'rgba(107, 114, 128, 0.9)', fontSize: 11, fontWeight: 500 }}
+            domain={[minPrice - priceRange * 0.05, maxPrice + priceRange * 0.05]}
           />
-          <Tooltip content={<CustomTooltip />} />
+          
+          {/* Custom tooltip */}
+          <Tooltip 
+            content={<CustomTooltip />}
+            cursor={{ 
+              stroke: isPositive ? '#059669' : '#DC2626',
+              strokeWidth: 1,
+              strokeDasharray: "5 5",
+            }}
+          />
+          
+          {/* Main area with sharp edges */}
           <Area
-            type="monotone"
+            type="linear" // Changed from "monotone" to "linear" for sharper edges
             dataKey="price"
-            stroke={isPositive ? "#10B981" : "#EF4444"}
-            strokeWidth={2}
-            fillOpacity={1}
-            fill="url(#colorPrice)"
+            stroke={isPositive ? "#059669" : "#DC2626"}
+            strokeWidth={2.5}
+            fill="url(#sharpGradient)"
+            dot={<CustomDot />}
+            activeDot={{
+              r: 6,
+              fill: "#FFFFFF",
+              stroke: isPositive ? "#059669" : "#DC2626",
+              strokeWidth: 3,
+            }}
+            connectNulls={true}
           />
+          
+          {/* Optional: Add reference lines for important levels */}
+          {priceRange > 0 && (
+            <>
+              <ReferenceLine
+                y={minPrice}
+                stroke="rgba(239, 68, 68, 0.3)"
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                label={{ 
+                  value: 'Low', 
+                  position: 'insideBottomRight',
+                  fill: 'rgba(239, 68, 68, 0.8)',
+                  fontSize: 10 
+                }}
+              />
+              <ReferenceLine
+                y={maxPrice}
+                stroke="rgba(34, 197, 94, 0.3)"
+                strokeWidth={1}
+                strokeDasharray="3 3"
+                label={{ 
+                  value: 'High', 
+                  position: 'insideTopRight',
+                  fill: 'rgba(34, 197, 94, 0.8)',
+                  fontSize: 10 
+                }}
+              />
+            </>
+          )}
         </AreaChart>
       </ResponsiveContainer>
     </motion.div>

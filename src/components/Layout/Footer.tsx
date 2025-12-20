@@ -1,13 +1,19 @@
-import { Twitter, Github, Send } from "lucide-react";
+import { Twitter, Github, Send, TrendingUp } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
     <footer className="bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900 text-gray-600 dark:text-gray-300 mt-10">
       <div className="max-w-6xl mx-auto px-4 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
         {/* Brand */}
-        <div className="text-lg font-semibold text-gray-800 dark:text-white">
-          JeyCrypto
-        </div>
+        <Link to="/" className="flex items-center space-x-2">
+                    <div className="p-2 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-lg">
+                      <TrendingUp className="w-6 h-6 text-white" />
+                    </div>
+                    <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
+                      JeyCryptoz
+                    </span>
+                  </Link>
 
         {/* Links */}
         <div className="flex space-x-6 text-sm">
@@ -47,7 +53,7 @@ const Footer = () => {
       </div>
 
       <div className="text-center text-xs text-gray-400 py-4">
-        © {new Date().getFullYear()} JeyCrypto. All rights reserved.
+        © {new Date().getFullYear()} JeyCryptoz. All rights reserved.
       </div>
     </footer>
   );

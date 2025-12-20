@@ -1,7 +1,9 @@
-import React from 'react';
+
+
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { PortfolioProvider } from './context/PortfolioContext';
+import { MarketProvider } from './context/MarketContext'; // Add this import
 import Layout from './components/Layout/Layout';
 import Home from './pages/Home';
 import Market from './pages/Market';
@@ -13,17 +15,19 @@ function App() {
   return (
     <ThemeProvider>
       <PortfolioProvider>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="market" element={<Market />} />
-              <Route path="coin/:id" element={<CoinDetail />} />
-              <Route path="portfolio" element={<Portfolio />} />
-              <Route path="*" element={<NotFound />} />
-            </Route>
-          </Routes>
-        </Router>
+        <MarketProvider> {/* Wrap with MarketProvider */}
+          <Router>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="market" element={<Market />} />
+                <Route path="coin/:id" element={<CoinDetail />} />
+                <Route path="portfolio" element={<Portfolio />} />
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </Router>
+        </MarketProvider>
       </PortfolioProvider>
     </ThemeProvider>
   );

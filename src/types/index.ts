@@ -30,9 +30,14 @@ export interface Coin {
   };
 }
 
-export interface CoinDetail extends Coin {
+export interface CoinDetail extends Omit<Coin, 'image'> {
   description: {
     en: string;
+  };
+  image: {
+    thumb: string;
+    small: string;
+    large: string;
   };
   links: {
     homepage: string[];
@@ -67,13 +72,17 @@ export interface PortfolioItem {
   coinId: string;
   symbol: string;
   name: string;
-  image: string;
+  image: {
+    thumb: string;
+    small: string;
+    large: string;
+  };
   amount: number;
   purchasePrice: number;
   purchaseDate: string;
 }
 
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = "light" | "dark";
 
-export type SortOption = 'market_cap' | 'price' | 'volume' | 'change';
-export type SortDirection = 'asc' | 'desc';
+export type SortOption = "price" | "market_cap" | "volume" | "change";
+export type SortDirection = "asc" | "desc";

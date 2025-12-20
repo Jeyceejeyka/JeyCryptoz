@@ -1,20 +1,21 @@
+
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
-import {ArrowUp} from 'lucide-react';
+import { ArrowUp } from 'lucide-react';
 
 const Layout: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
       <Navbar />
-      <main className="relative">
+      <main className="flex-1 relative"> {/* Added flex-1 here */}
         <Outlet />
       </main>
-      <Footer /> 
+      <Footer /> {/* This will now stick to bottom */}
       
       <button
-        className="fixed bottom-4 right-4 p-3 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors duration-300"
+        className="fixed bottom-20 right-4 p-3 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors duration-300 z-50"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
         aria-label="Scroll to top"
       >

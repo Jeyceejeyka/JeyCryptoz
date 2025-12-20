@@ -1,34 +1,25 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Filter, SortAsc, SortDesc } from 'lucide-react';
-import { Coin, SortOption, SortDirection } from '../types';
-import { fetchCoins } from '../utils/api';
+import { Filter, SortAsc, SortDesc, RefreshCw } from 'lucide-react';
+import { SortOption, SortDirection } from '../types';
+import { useMarket } from '../context/MarketContext'; // Import the hook
 import CoinCard from '../components/UI/CoinCard';
 import SearchBar from '../components/UI/SearchBar';
 import { PageLoader } from '../components/UI/Loader';
 
 const Market: React.FC = () => {
-  const [coins, setCoins] = useState<Coin[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { coins, loading, lastUpdated, error, refreshCoins } = useMarket(); // Use context
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('market_cap');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
   const [showFilters, setShowFilters] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    const loadCoins = async () => {
-      try {
-        const data = await fetchCoins(1, 100);
-        setCoins(data);
-      } catch (error) {
-        console.error('Error loading coins:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCoins();
-  }, []);
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refreshCoins();
+    setRefreshing(false);
+  };
 
   const filteredAndSortedCoins = useMemo(() => {
     let filtered = coins;
@@ -42,33 +33,38 @@ const Market: React.FC = () => {
       );
     }
 
+    // Create a copy to avoid mutating the original array
+    const sorted = [...filtered];
+    
     // Apply sorting
-    filtered.sort((a, b) => {
-      let aValue: number;
-      let bValue: number;
+    sorted.sort((a, b) => {
+      let aValue: number = 0;
+      let bValue: number = 0;
 
       switch (sortBy) {
         case 'price':
-          aValue = a.current_price;
-          bValue = b.current_price;
+          aValue = a.current_price || 0;
+          bValue = b.current_price || 0;
           break;
         case 'volume':
-          aValue = a.total_volume;
-          bValue = b.total_volume;
+          aValue = a.total_volume || 0;
+          bValue = b.total_volume || 0;
           break;
         case 'change':
-          aValue = a.price_change_percentage_24h;
-          bValue = b.price_change_percentage_24h;
+          aValue = a.price_change_percentage_24h || 0;
+          bValue = b.price_change_percentage_24h || 0;
           break;
+        case 'market_cap':
         default:
-          aValue = a.market_cap;
-          bValue = b.market_cap;
+          aValue = a.market_cap || 0;
+          bValue = b.market_cap || 0;
+          break;
       }
 
-      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      return sortDirection === 'desc' ? bValue - aValue : aValue - bValue;
     });
 
-    return filtered;
+    return sorted;
   }, [coins, searchQuery, sortBy, sortDirection]);
 
   const handleSort = (option: SortOption) => {
@@ -80,8 +76,24 @@ const Market: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && coins.length === 0) {
     return <PageLoader />;
+  }
+
+  if (error && coins.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-xl text-red-600 dark:text-red-400">{error}</p>
+          <button
+            onClick={refreshCoins}
+            className="mt-4 px-4 py-2 bg-purple-500 text-white rounded-lg hover:bg-purple-600"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -93,12 +105,27 @@ const Market: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">
-            Cryptocurrency Market
-          </h1>
+          <div className="flex items-center justify-center gap-4 mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
+              Cryptocurrency Market
+            </h1>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className={`p-2 rounded-full ${refreshing ? 'bg-gray-300' : 'bg-purple-100 dark:bg-purple-900'} hover:bg-purple-200 dark:hover:bg-purple-800 transition-colors`}
+              title="Refresh data"
+            >
+              <RefreshCw className={`w-5 h-5 ${refreshing ? 'animate-spin text-gray-500' : 'text-purple-600 dark:text-purple-300'}`} />
+            </button>
+          </div>
           <p className="text-xl text-gray-600 dark:text-gray-300">
             Explore and analyze the top cryptocurrencies
           </p>
+          {lastUpdated && (
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </p>
+          )}
         </motion.div>
 
         {/* Search and Filters */}
@@ -152,6 +179,14 @@ const Market: React.FC = () => {
           </div>
         </div>
 
+        {/* Display refreshing overlay if refreshing with existing data */}
+        {refreshing && coins.length > 0 && (
+          <div className="fixed top-20 right-4 bg-purple-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin" />
+            <span>Updating...</span>
+          </div>
+        )}
+
         {/* Coins Grid */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -165,14 +200,14 @@ const Market: React.FC = () => {
         </motion.div>
 
         {/* No Results */}
-        {filteredAndSortedCoins.length === 0 && (
+        {filteredAndSortedCoins.length === 0 && searchQuery && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
             <p className="text-xl text-gray-600 dark:text-gray-400">
-              No cryptocurrencies found matching your criteria.
+              No cryptocurrencies found matching "{searchQuery}".
             </p>
           </motion.div>
         )}

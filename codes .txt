@@ -1,0 +1,1233 @@
+// import React from 'react';
+// import { Outlet } from 'react-router-dom';
+// import Navbar from './Navbar';
+// import Footer from './Footer';
+// import {ArrowUp} from 'lucide-react';
+
+// const Layout: React.FC = () => {
+//   return (
+//     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-blue-900 dark:to-purple-900">
+//       <Navbar />
+//       <main className="relative">
+//         <Outlet />
+//       </main>
+//       <Footer /> 
+      
+//       <button
+//         className="fixed bottom-4 right-4 p-3 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-colors duration-300"
+//         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+//         aria-label="Scroll to top"
+//       >
+//         <ArrowUp />
+//       </button>
+      
+//       {/* Background Effects */}
+//       <div className="fixed inset-0 pointer-events-none -z-10">
+//         <div className="absolute top-0 left-0 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse" />
+//         <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+//         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-500" />
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Layout;
+
+
+
+// import React from 'react';
+// import { motion } from 'framer-motion';
+// import {
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   ResponsiveContainer,
+//   Area,
+//   AreaChart,
+// } from 'recharts';
+// import { PriceData } from '../../types';
+// import { formatCurrency } from '../../utils/formatters';
+
+// interface ChartProps {
+//   data: PriceData;
+//   days: number;
+//   isPositive: boolean;
+// }
+
+// const Chart: React.FC<ChartProps> = ({ data, days, isPositive }) => {
+//   const chartData = data.prices.map(([timestamp, price]) => ({
+//     time: timestamp,
+//     price: price,
+//     date: new Date(timestamp).toLocaleDateString(),
+//     formattedDate: new Date(timestamp).toLocaleString(),
+//   }));
+
+//   const formatXAxis = (tickItem: number) => {
+//     const date = new Date(tickItem);
+//     if (days <= 1) {
+//       return date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+//     } else if (days <= 7) {
+//       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+//     } else {
+//       return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+//     }
+//   };
+
+//   const CustomTooltip = ({ active, payload, label }: any) => {
+//     if (active && payload && payload.length) {
+//       return (
+//         <motion.div
+//           initial={{ opacity: 0, scale: 0.8 }}
+//           animate={{ opacity: 1, scale: 1 }}
+//           className="bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg p-3 rounded-lg border border-white/20 dark:border-gray-700/20"
+//         >
+//           <p className="text-sm text-gray-600 dark:text-gray-400">
+//             {new Date(label).toLocaleString()}
+//           </p>
+//           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+//             {formatCurrency(payload[0].value)}
+//           </p>
+//         </motion.div>
+//       );
+//     }
+//     return null;
+//   };
+
+//   return (
+//     <motion.div
+//       initial={{ opacity: 0, y: 20 }}
+//       animate={{ opacity: 1, y: 0 }}
+//       transition={{ duration: 0.5 }}
+//       className="w-full h-80 p-4 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-xl border border-white/20 dark:border-gray-700/20"
+//     >
+//       <ResponsiveContainer width="100%" height="100%">
+//         <AreaChart data={chartData}>
+//           <defs>
+//             <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+//               <stop
+//                 offset="5%"
+//                 stopColor={isPositive ? "#10B981" : "#EF4444"}
+//                 stopOpacity={0.3}
+//               />
+//               <stop
+//                 offset="95%"
+//                 stopColor={isPositive ? "#10B981" : "#EF4444"}
+//                 stopOpacity={0}
+//               />
+//             </linearGradient>
+//           </defs>
+//           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+//           <XAxis
+//             dataKey="time"
+//             tickFormatter={formatXAxis}
+//             axisLine={false}
+//             tickLine={false}
+//             tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+//           />
+//           <YAxis
+//             tickFormatter={(value) => formatCurrency(value)}
+//             axisLine={false}
+//             tickLine={false}
+//             tick={{ fill: 'rgba(156, 163, 175, 0.8)', fontSize: 12 }}
+//           />
+//           <Tooltip content={<CustomTooltip />} />
+//           <Area
+//             type="monotone"
+//             dataKey="price"
+//             stroke={isPositive ? "#10B981" : "#EF4444"}
+//             strokeWidth={2}
+//             fillOpacity={1}
+//             fill="url(#colorPrice)"
+//           />
+//         </AreaChart>
+//       </ResponsiveContainer>
+//     </motion.div>
+//   );
+// };
+
+// export default Chart;
+
+
+
+// import React, { createContext, useContext } from 'react';
+// import { PortfolioItem } from '../types';
+// import { useLocalStorage } from '../hooks/useLocalStorage';
+
+// interface PortfolioContextType {
+//   portfolio: PortfolioItem[];
+//   addToPortfolio: (item: Omit<PortfolioItem, 'purchaseDate'>) => void;
+//   removeFromPortfolio: (coinId: string) => void;
+//   updatePortfolioItem: (coinId: string, updates: Partial<PortfolioItem>) => void;
+//   isInPortfolio: (coinId: string) => boolean;
+// }
+
+// const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+
+// export const usePortfolio = () => {
+//   const context = useContext(PortfolioContext);
+//   if (context === undefined) {
+//     throw new Error('usePortfolio must be used within a PortfolioProvider');
+//   }
+//   return context;
+// };
+
+// interface PortfolioProviderProps {
+//   children: React.ReactNode;
+// }
+
+// // PortfolioProvider component to manage portfolio state
+// export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }) => {
+//   const [portfolio, setPortfolio] = useLocalStorage<PortfolioItem[]>('portfolio', []);
+
+//   const addToPortfolio = (item: Omit<PortfolioItem, 'purchaseDate'>) => {
+//     const newItem: PortfolioItem = {
+//       ...item,
+//       purchaseDate: new Date().toISOString(),
+//     };
+//     setPortfolio([...portfolio, newItem]);
+//   };
+
+//   const removeFromPortfolio = (coinId: string) => {
+//     setPortfolio(portfolio.filter(item => item.coinId !== coinId));
+//   };
+
+//   const updatePortfolioItem = (coinId: string, updates: Partial<PortfolioItem>) => {
+//     setPortfolio(portfolio.map(item => 
+//       item.coinId === coinId ? { ...item, ...updates } : item
+//     ));
+//   };
+
+//   const isInPortfolio = (coinId: string) => {
+//     return portfolio.some(item => item.coinId === coinId);
+//   };
+
+//   return (
+//     <PortfolioContext.Provider value={{
+//       portfolio,
+//       addToPortfolio,
+//       removeFromPortfolio,
+//       updatePortfolioItem,
+//       isInPortfolio,
+//     }}>
+//       {children}
+//     </PortfolioContext.Provider>
+//   );
+// };
+
+
+
+// import React, { createContext, useContext } from 'react';
+// import { PortfolioItem } from '../types';
+// import { useLocalStorage } from '../hooks/useLocalStorage';
+
+// interface PortfolioContextType {
+//   portfolio: PortfolioItem[];
+//   addToPortfolio: (item: Omit<PortfolioItem, 'purchaseDate'>) => void;
+//   removeFromPortfolio: (coinId: string) => void;
+//   updatePortfolioItem: (coinId: string, updates: Partial<PortfolioItem>) => void;
+//   isInPortfolio: (coinId: string) => boolean;
+// }
+
+// const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
+
+// export const usePortfolio = () => {
+//   const context = useContext(PortfolioContext);
+//   if (context === undefined) {
+//     throw new Error('usePortfolio must be used within a PortfolioProvider');
+//   }
+//   return context;
+// };
+
+// interface PortfolioProviderProps {
+//   children: React.ReactNode;
+// }
+
+// // PortfolioProvider component to manage portfolio state
+// export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }) => {
+//   const [portfolio, setPortfolio] = useLocalStorage<PortfolioItem[]>('portfolio', []);
+
+//   const addToPortfolio = (item: Omit<PortfolioItem, 'purchaseDate'>) => {
+//     const newItem: PortfolioItem = {
+//       ...item,
+//       purchaseDate: new Date().toISOString(),
+//     };
+//     setPortfolio([...portfolio, newItem]);
+//   };
+
+//   const removeFromPortfolio = (coinId: string) => {
+//     setPortfolio(portfolio.filter(item => item.coinId !== coinId));
+//   };
+
+//   const updatePortfolioItem = (coinId: string, updates: Partial<PortfolioItem>) => {
+//     setPortfolio(portfolio.map(item => 
+//       item.coinId === coinId ? { ...item, ...updates } : item
+//     ));
+//   };
+
+//   const isInPortfolio = (coinId: string) => {
+//     return portfolio.some(item => item.coinId === coinId);
+//   };
+
+//   return (
+//     <PortfolioContext.Provider value={{
+//       portfolio,
+//       addToPortfolio,
+//       removeFromPortfolio,
+//       updatePortfolioItem,
+//       isInPortfolio,
+//     }}>
+//       {children}
+//     </PortfolioContext.Provider>
+//   );
+// };
+
+
+
+// import React, { createContext, useContext } from 'react';
+// import { ThemeMode } from '../types';
+// import { useLocalStorage } from '../hooks/useLocalStorage';
+
+// interface ThemeContextType {
+//   theme: ThemeMode;
+//   toggleTheme: () => void;
+// }
+
+// const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+// export const useTheme = () => {
+//   const context = useContext(ThemeContext);
+//   if (context === undefined) {
+//     throw new Error('useTheme must be used within a ThemeProvider');
+//   }
+//   return context;
+// };
+
+// interface ThemeProviderProps {
+//   children: React.ReactNode;
+// }
+
+// export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+//   const [theme, setTheme] = useLocalStorage<ThemeMode>('theme', 'dark');
+
+//   const toggleTheme = () => {
+//     setTheme(theme === 'light' ? 'dark' : 'light');
+//   };
+
+//   React.useEffect(() => {
+//     document.documentElement.classList.toggle('dark', theme === 'dark');
+//   }, [theme]);
+
+//   return (
+//     <ThemeContext.Provider value={{ theme, toggleTheme }}>
+//       {children}
+//     </ThemeContext.Provider>
+//   );
+// };
+
+
+
+// import { useState } from 'react';
+
+// export function useLocalStorage<T>(key: string, initialValue: T) {
+//   const [storedValue, setStoredValue] = useState<T>(() => {
+//     try {
+//       const item = window.localStorage.getItem(key);
+//       return item ? JSON.parse(item) : initialValue;
+//     } catch (error) {
+//       console.error(`Error reading localStorage key "${key}":`, error);
+//       return initialValue;
+//     }
+//   });
+
+//   const setValue = (value: T | ((val: T) => T)) => {
+//     try {
+//       const valueToStore = value instanceof Function ? value(storedValue) : value;
+//       setStoredValue(valueToStore);
+//       window.localStorage.setItem(key, JSON.stringify(valueToStore));
+//     } catch (error) {
+//       console.error(`Error setting localStorage key "${key}":`, error);
+//     }
+//   };
+
+//   return [storedValue, setValue] as const;
+// }
+
+
+// import React, { useState, useEffect, useMemo } from 'react';
+// import { motion } from 'framer-motion';
+// import { Filter, SortAsc, SortDesc } from 'lucide-react';
+// import { Coin, SortOption, SortDirection } from '../types';
+// import { fetchCoins } from '../utils/api';
+// import CoinCard from '../components/UI/CoinCard';
+// import SearchBar from '../components/UI/SearchBar';
+// import { PageLoader } from '../components/UI/Loader';
+
+// const Market: React.FC = () => {
+//   const [coins, setCoins] = useState<Coin[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [sortBy, setSortBy] = useState<SortOption>('market_cap');
+//   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+//   const [showFilters, setShowFilters] = useState(false);
+
+//   useEffect(() => {
+//     const loadCoins = async () => {
+//       try {
+//         const data = await fetchCoins(1, 100);
+//         console.log('Fetched coins:', data[1].current_price);
+//         setCoins(data);
+//       } catch (error) {
+//         console.error('Error loading coins:', error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     loadCoins();
+//   }, []);
+
+//   const filteredAndSortedCoins = useMemo(() => {
+//     let filtered = coins;
+
+//     // Apply search filter
+//     if (searchQuery) {
+//       filtered = coins.filter(
+//         (coin) =>
+//           coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//           coin.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     }
+
+//     // Apply sorting
+//     filtered.sort((a, b) => {
+//       let aValue: number;
+//       let bValue: number;
+
+//       switch (sortBy) {
+//         case 'price':
+//           aValue = a.current_price;
+//           bValue = b.current_price;
+//           break;
+//         case 'volume':
+//           aValue = a.total_volume;
+//           bValue = b.total_volume;
+//           break;
+//         case 'change':
+//           aValue = a.price_change_percentage_24h;
+//           bValue = b.price_change_percentage_24h;
+//           break;
+//         default:
+//           aValue = a.market_cap;
+//           bValue = b.market_cap;
+//       }
+
+//       return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+//     });
+
+//     return filtered;
+//   }, [coins, searchQuery, sortBy, sortDirection]);
+
+//   const handleSort = (option: SortOption) => {
+//     if (sortBy === option) {
+//       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+//     } else {
+//       setSortBy(option);
+//       setSortDirection('desc');
+//     }
+//   };
+
+//   if (loading) {
+//     return <PageLoader />;
+//   }
+
+//   return (
+//     <div className="min-h-screen py-8">
+//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+//         {/* Header */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="text-center mb-12"
+//         >
+//           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">
+//             Cryptocurrency Market
+//           </h1>
+//           <p className="text-xl text-gray-600 dark:text-gray-300">
+//             Explore and analyze the top cryptocurrencies
+//           </p>
+//         </motion.div>
+
+//         {/* Search and Filters */}
+//         <div className="mb-8 space-y-4">
+//           <SearchBar
+//             onSearch={setSearchQuery}
+//             placeholder="Search cryptocurrencies..."
+//           />
+          
+//           <div className="flex flex-wrap items-center justify-between gap-4">
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setShowFilters(!showFilters)}
+//                 className="flex items-center space-x-2 px-4 py-2 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-lg border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
+//               >
+//                 <Filter className="w-4 h-4" />
+//                 <span>Filters</span>
+//               </button>
+              
+//               <div className="text-sm text-gray-600 dark:text-gray-400">
+//                 Showing {filteredAndSortedCoins.length} of {coins.length} cryptocurrencies
+//               </div>
+//             </div>
+
+//             {/* Sort Options */}
+//             <div className="flex items-center space-x-2">
+//               {[
+//                 { key: 'price', label: 'Price' },
+//                 { key: 'market_cap', label: 'Market Cap' },
+//                 { key: 'volume', label: 'Volume' },
+//                 { key: 'change', label: '24h Change' },
+//               ].map((option) => (
+//                 <button
+//                   key={option.key}
+//                   onClick={() => handleSort(option.key as SortOption)}
+//                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+//                     sortBy === option.key
+//                       ? 'bg-purple-500 text-white'
+//                       : 'bg-white/10 dark:bg-gray-800/10 text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-800/20'
+//                   }`}
+//                 >
+//                   <span>{option.label}</span>
+//                   {sortBy === option.key && (
+//                     sortDirection === 'asc' ? 
+//                       <SortAsc className="w-3 h-3" /> : 
+//                       <SortDesc className="w-3 h-3" />
+//                   )}
+//                 </button>
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+
+//         {/* Coins Grid */}
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ duration: 0.5 }}
+//           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+//         >
+//           {filteredAndSortedCoins.map((coin, index) => (
+//             <CoinCard key={coin.id} coin={coin} index={index} />
+//           ))}
+//         </motion.div>
+
+//         {/* No Results */}
+//         {filteredAndSortedCoins.length === 0 && (
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             className="text-center py-12"
+//           >
+//             <p className="text-xl text-gray-600 dark:text-gray-400">
+//               No cryptocurrencies found matching your criteria.
+//             </p>
+//           </motion.div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Market;
+
+
+
+
+
+// import React, { useState, useEffect, useMemo } from 'react';
+// import { motion } from 'framer-motion';
+// import { Filter, SortAsc, SortDesc } from 'lucide-react';
+// import { Coin, SortOption, SortDirection } from '../types';
+// import { fetchCoins } from '../utils/api';
+// import CoinCard from '../components/UI/CoinCard';
+// import SearchBar from '../components/UI/SearchBar';
+// import { PageLoader } from '../components/UI/Loader';
+
+// const Market: React.FC = () => {
+//   const [coins, setCoins] = useState<Coin[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const [sortBy, setSortBy] = useState<SortOption>('market_cap');
+//   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+//   const [showFilters, setShowFilters] = useState(false);
+
+//   useEffect(() => {
+//     const loadCoins = async () => {
+//       try {
+//         const data = await fetchCoins(1, 100);
+//         setCoins(data);
+        
+//         // Debug: Check the data structure
+//         console.log('=== COINS DATA LOADED ===');
+//         console.log(`Total coins loaded: ${data.length}`);
+        
+//         if (data.length > 0) {
+//           // Check Bitcoin (should be in data)
+//           const bitcoin = data.find(coin => coin.symbol === 'btc');
+//           if (bitcoin) {
+//             console.log('Bitcoin found:');
+//             console.log(`  Price: $${bitcoin.current_price}`);
+//             console.log(`  Market Cap: $${bitcoin.market_cap}`);
+//             console.log(`  Volume: $${bitcoin.total_volume}`);
+//             console.log(`  24h Change: ${bitcoin.price_change_percentage_24h}%`);
+//           }
+          
+//           // Find highest price coin
+//           const highestPriceCoin = data.reduce((max, coin) => 
+//             coin.current_price > max.current_price ? coin : max
+//           );
+//           console.log(`Highest price: ${highestPriceCoin.name} at $${highestPriceCoin.current_price}`);
+          
+//           // Find highest market cap coin
+//           const highestMarketCapCoin = data.reduce((max, coin) => 
+//             coin.market_cap > max.market_cap ? coin : max
+//           );
+//           console.log(`Highest market cap: ${highestMarketCapCoin.name} at $${highestMarketCapCoin.market_cap}`);
+//         }
+        
+//       } catch (error) {
+//         console.error('Error loading coins:', error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     loadCoins();
+//   }, []);
+
+//   const filteredAndSortedCoins = useMemo(() => {
+//     let filtered = coins;
+
+//     // Apply search filter
+//     if (searchQuery) {
+//       filtered = coins.filter(
+//         (coin) =>
+//           coin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+//           coin.symbol.toLowerCase().includes(searchQuery.toLowerCase())
+//       );
+//     }
+
+//     // Create a copy to avoid mutating the original array
+//     const sorted = [...filtered];
+    
+//     // Apply sorting
+//     sorted.sort((a, b) => {
+//       let aValue: number = 0;
+//       let bValue: number = 0;
+
+//       // SWAPPED LOGIC: 
+//       // - When "Price" button is clicked → sort by MARKET CAP
+//       // - When "Market Cap" button is clicked → sort by PRICE
+//       switch (sortBy) {
+//         case 'price':
+//           // When user clicks "Price" → sort by MARKET CAP
+//           aValue = a.market_cap || 0;
+//           bValue = b.market_cap || 0;
+//           break;
+//         case 'volume':
+//           aValue = a.total_volume || 0;
+//           bValue = b.total_volume || 0;
+//           break;
+//         case 'change':
+//           aValue = a.price_change_percentage_24h || 0;
+//           bValue = b.price_change_percentage_24h || 0;
+//           break;
+//         case 'market_cap':
+//           // When user clicks "Market Cap" → sort by PRICE
+//           aValue = a.current_price || 0;
+//           bValue = b.current_price || 0;
+//           break;
+//         default:
+//           aValue = a.market_cap || 0;
+//           bValue = b.market_cap || 0;
+//       }
+
+//       // Sort direction logic
+//       if (sortDirection === 'desc') {
+//         // Descending: highest values first
+//         return bValue - aValue;
+//       } else {
+//         // Ascending: lowest values first
+//         return aValue - bValue;
+//       }
+//     });
+
+//     // Debug sorting results
+//     console.log(`=== SORTING RESULTS ===`);
+//     console.log(`Sort button clicked: ${sortBy}`);
+//     console.log(`Actually sorting by: ${sortBy === 'price' ? 'MARKET CAP' : sortBy === 'market_cap' ? 'PRICE' : sortBy.toUpperCase()}`);
+//     console.log(`Direction: ${sortDirection.toUpperCase()}`);
+    
+//     if (sorted.length > 0) {
+//       console.log(`Top 3 coins after sort:`);
+//       sorted.slice(0, 3).forEach((coin, index) => {
+//         if (sortBy === 'price') {
+//           console.log(`${index + 1}. ${coin.name} - Market Cap: $${coin.market_cap}`);
+//         } else if (sortBy === 'market_cap') {
+//           console.log(`${index + 1}. ${coin.name} - Price: $${coin.current_price}`);
+//         } else if (sortBy === 'volume') {
+//           console.log(`${index + 1}. ${coin.name} - Volume: $${coin.total_volume}`);
+//         } else {
+//           console.log(`${index + 1}. ${coin.name} - 24h Change: ${coin.price_change_percentage_24h}%`);
+//         }
+//       });
+//     }
+
+//     return sorted;
+//   }, [coins, searchQuery, sortBy, sortDirection]);
+
+//   const handleSort = (option: SortOption) => {
+//     if (sortBy === option) {
+//       // Toggle direction if same button is clicked
+//       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+//     } else {
+//       // New button clicked, set to descending by default
+//       setSortBy(option);
+//       setSortDirection('desc');
+//     }
+    
+//     // Debug which button was clicked
+//     console.log(`\n=== BUTTON CLICKED ===`);
+//     console.log(`Button: "${option}"`);
+//     console.log(`Will sort by: ${option === 'price' ? 'MARKET CAP' : option === 'market_cap' ? 'PRICE' : option.toUpperCase()}`);
+//   };
+
+//   if (loading) {
+//     return <PageLoader />;
+//   }
+
+//   return (
+//     <div className="min-h-screen py-8">
+//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+//         {/* Header */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="text-center mb-12"
+//         >
+//           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">
+//             Cryptocurrency Market
+//           </h1>
+//           <p className="text-xl text-gray-600 dark:text-gray-300">
+//             Explore and analyze the top cryptocurrencies
+//           </p>
+//         </motion.div>
+
+//         {/* Search and Filters */}
+//         <div className="mb-8 space-y-4">
+//           <SearchBar
+//             onSearch={setSearchQuery}
+//             placeholder="Search cryptocurrencies..."
+//           />
+          
+//           <div className="flex flex-wrap items-center justify-between gap-4">
+//             <div className="flex items-center space-x-2">
+//               <button
+//                 onClick={() => setShowFilters(!showFilters)}
+//                 className="flex items-center space-x-2 px-4 py-2 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-lg border border-white/20 dark:border-gray-700/20 hover:bg-white/20 dark:hover:bg-gray-800/20 transition-colors"
+//               >
+//                 <Filter className="w-4 h-4" />
+//                 <span>Filters</span>
+//               </button>
+              
+//               <div className="text-sm text-gray-600 dark:text-gray-400">
+//                 Showing {filteredAndSortedCoins.length} of {coins.length} cryptocurrencies
+//               </div>
+//             </div>
+
+//             {/* Sort Options */}
+//             <div className="flex items-center space-x-2">
+//               {[
+//                 { key: 'price', label: 'Price' },
+//                 { key: 'market_cap', label: 'Market Cap' },
+//                 { key: 'volume', label: 'Volume' },
+//                 { key: 'change', label: '24h Change' },
+//               ].map((option) => (
+//                 <button
+//                   key={option.key}
+//                   onClick={() => handleSort(option.key as SortOption)}
+//                   className={`flex items-center space-x-1 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+//                     sortBy === option.key
+//                       ? 'bg-purple-500 text-white'
+//                       : 'bg-white/10 dark:bg-gray-800/10 text-gray-700 dark:text-gray-300 hover:bg-white/20 dark:hover:bg-gray-800/20'
+//                   }`}
+//                 >
+//                   <span>{option.label}</span>
+//                   {sortBy === option.key && (
+//                     sortDirection === 'asc' ? 
+//                       <SortAsc className="w-3 h-3" /> : 
+//                       <SortDesc className="w-3 h-3" />
+//                   )}
+//                 </button>
+//               ))}
+//             </div>
+//           </div>
+          
+//           {/* Info message about swapped logic */}
+//           <div className="mt-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded border border-blue-200 dark:border-blue-800">
+//             <p className="text-xs text-blue-700 dark:text-blue-300">
+//               <span className="font-semibold">Note:</span> "Price" sorts by <strong>Market Cap</strong> • 
+//               "Market Cap" sorts by <strong>Price</strong>
+//             </p>
+//           </div>
+//         </div>
+
+//         {/* Coins Grid */}
+//         <motion.div
+//           initial={{ opacity: 0 }}
+//           animate={{ opacity: 1 }}
+//           transition={{ duration: 0.5 }}
+//           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+//         >
+//           {filteredAndSortedCoins.map((coin, index) => (
+//             <CoinCard key={coin.id} coin={coin} index={index} />
+//           ))}
+//         </motion.div>
+
+//         {/* Debug info - You can remove this after testing */}
+//         {filteredAndSortedCoins.length > 0 && (
+//           <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+//             <h3 className="font-bold text-gray-700 dark:text-gray-300 mb-2">Sorting Info (Debug):</h3>
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+//               <div>
+//                 <p className="text-gray-600 dark:text-gray-400">Current sort:</p>
+//                 <p className="font-medium">
+//                   Button: <span className="text-purple-600 dark:text-purple-400">{sortBy}</span> • 
+//                   Direction: <span className="text-purple-600 dark:text-purple-400">{sortDirection}</span>
+//                 </p>
+//                 <p className="text-gray-600 dark:text-gray-400 mt-1">
+//                   Actually sorting by: <span className="font-medium">
+//                     {sortBy === 'price' ? 'Market Cap' : sortBy === 'market_cap' ? 'Price' : sortBy}
+//                   </span>
+//                 </p>
+//               </div>
+//               <div>
+//                 <p className="text-gray-600 dark:text-gray-400">First coin:</p>
+//                 <p className="font-medium">
+//                   {filteredAndSortedCoins[0].name} • 
+//                   {sortBy === 'price' && ` Market Cap: $${filteredAndSortedCoins[0].market_cap?.toLocaleString()}`}
+//                   {sortBy === 'market_cap' && ` Price: $${filteredAndSortedCoins[0].current_price?.toLocaleString()}`}
+//                   {sortBy === 'volume' && ` Volume: $${filteredAndSortedCoins[0].total_volume?.toLocaleString()}`}
+//                   {sortBy === 'change' && ` Change: ${filteredAndSortedCoins[0].price_change_percentage_24h?.toFixed(2)}%`}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+//         )}
+
+//         {/* No Results */}
+//         {filteredAndSortedCoins.length === 0 && (
+//           <motion.div
+//             initial={{ opacity: 0 }}
+//             animate={{ opacity: 1 }}
+//             className="text-center py-12"
+//           >
+//             <p className="text-xl text-gray-600 dark:text-gray-400">
+//               No cryptocurrencies found matching your criteria.
+//             </p>
+//           </motion.div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Market;
+
+
+
+// import React, { useState, useEffect } from 'react';
+// import { motion } from 'framer-motion';
+// import { Plus, Trash2, Edit2, TrendingUp, TrendingDown } from 'lucide-react';
+// import { usePortfolio } from '../context/PortfolioContext';
+// import { Coin } from '../types';
+// import { fetchCoins } from '../utils/api';
+// import { formatCurrency, formatPercentage, getChangeColor } from '../utils/formatters';
+
+// const Portfolio: React.FC = () => {
+//   const { portfolio, removeFromPortfolio, updatePortfolioItem } = usePortfolio();
+//   const [currentPrices, setCurrentPrices] = useState<{ [key: string]: Coin }>({});
+//   const [editingItem, setEditingItem] = useState<string | null>(null);
+//   const [editAmount, setEditAmount] = useState('');
+//   const [loading, setLoading] = useState(true);
+
+//   useEffect(() => {
+//     const loadCurrentPrices = async () => {
+//       if (portfolio.length === 0) {
+//         setLoading(false);
+//         return;
+//       }
+
+//       try {
+//         const coins = await fetchCoins(1, 250);
+//         const pricesMap = coins.reduce((acc, coin) => {
+//           acc[coin.id] = coin;
+//           return acc;
+//         }, {} as { [key: string]: Coin });
+//         setCurrentPrices(pricesMap);
+//       } catch (error) {
+//         console.error('Error loading current prices:', error);
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     loadCurrentPrices();
+//   }, [portfolio]);
+
+//   const handleEditAmount = (coinId: string, currentAmount: number) => {
+//     setEditingItem(coinId);
+//     setEditAmount(currentAmount.toString());
+//   };
+
+//   const handleSaveAmount = (coinId: string) => {
+//     const amount = parseFloat(editAmount);
+//     if (amount >= 0) {
+//       updatePortfolioItem(coinId, { amount });
+//     }
+//     setEditingItem(null);
+//     setEditAmount('');
+//   };
+
+//   const calculatePortfolioValue = () => {
+//     return portfolio.reduce((total, item) => {
+//       const currentPrice = currentPrices[item.coinId]?.current_price || 0;
+//       return total + (item.amount * currentPrice);
+//     }, 0);
+//   };
+
+//   const calculateTotalPnL = () => {
+//     return portfolio.reduce((total, item) => {
+//       const currentPrice = currentPrices[item.coinId]?.current_price || 0;
+//       const purchaseValue = item.amount * item.purchasePrice;
+//       const currentValue = item.amount * currentPrice;
+//       return total + (currentValue - purchaseValue);
+//     }, 0);
+//   };
+
+//   const totalValue = calculatePortfolioValue();
+//   const totalPnL = calculateTotalPnL();
+//   const totalPnLPercentage = portfolio.length > 0 ? (totalPnL / (totalValue - totalPnL)) * 100 : 0;
+
+//   if (loading) {
+//     return (
+//       <div className="flex items-center justify-center min-h-[400px]">
+//         <div className="text-center">
+//           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+//           <p className="text-gray-600 dark:text-gray-400">Loading portfolio...</p>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen py-8">
+//       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+//         {/* Header */}
+//         <motion.div
+//           initial={{ opacity: 0, y: 20 }}
+//           animate={{ opacity: 1, y: 0 }}
+//           className="text-center mb-12"
+//         >
+//           <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-4">
+//             My Portfolio
+//           </h1>
+//           <p className="text-xl text-gray-600 dark:text-gray-300">
+//             Track your cryptocurrency investments
+//           </p>
+//         </motion.div>
+
+//         {portfolio.length === 0 ? (
+//           <motion.div
+//             initial={{ opacity: 0, y: 20 }}
+//             animate={{ opacity: 1, y: 0 }}
+//             className="text-center py-20"
+//           >
+//             <div className="max-w-md mx-auto">
+//               <div className="w-24 h-24 bg-gradient-to-r from-purple-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-6">
+//                 <Plus className="w-12 h-12 text-white" />
+//               </div>
+//               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+//                 Your portfolio is empty
+//               </h2>
+//               <p className="text-gray-600 dark:text-gray-400 mb-8">
+//                 Start building your portfolio by adding cryptocurrencies from the market page.
+//               </p>
+//               <motion.a
+//                 href="/market"
+//                 whileHover={{ scale: 1.05 }}
+//                 whileTap={{ scale: 0.95 }}
+//                 className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-xl hover:from-purple-600 hover:to-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl"
+//               >
+//                 <Plus className="w-5 h-5" />
+//                 <span>Explore Market</span>
+//               </motion.a>
+//             </div>
+//           </motion.div>
+//         ) : (
+//           <>
+//             {/* Portfolio Summary */}
+//             <motion.div
+//               initial={{ opacity: 0, y: 20 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               className="grid md:grid-cols-3 gap-6 mb-8"
+//             >
+//               <div className="p-6 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-xl border border-white/20 dark:border-gray-700/20">
+//                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+//                   Total Value
+//                 </h3>
+//                 <p className="text-3xl font-bold text-gray-900 dark:text-white">
+//                   {formatCurrency(totalValue)}
+//                 </p>
+//               </div>
+              
+//               <div className="p-6 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-xl border border-white/20 dark:border-gray-700/20">
+//                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+//                   Total P&L
+//                 </h3>
+//                 <div className={`text-3xl font-bold ${getChangeColor(totalPnL)}`}>
+//                   {formatCurrency(totalPnL)}
+//                 </div>
+//               </div>
+              
+//               <div className="p-6 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-xl border border-white/20 dark:border-gray-700/20">
+//                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+//                   Total P&L %
+//                 </h3>
+//                 <div className={`flex items-center space-x-1 text-2xl font-bold ${getChangeColor(totalPnL)}`}>
+//                   {totalPnL >= 0 ? (
+//                     <TrendingUp className="w-6 h-6" />
+//                   ) : (
+//                     <TrendingDown className="w-6 h-6" />
+//                   )}
+//                   <span>{formatPercentage(totalPnLPercentage)}</span>
+//                 </div>
+//               </div>
+//             </motion.div>
+
+//             {/* Portfolio Items */}
+//             <motion.div
+//               initial={{ opacity: 0, y: 20 }}
+//               animate={{ opacity: 1, y: 0 }}
+//               transition={{ delay: 0.2 }}
+//               className="space-y-4"
+//             >
+//               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+//                 Holdings
+//               </h2>
+              
+//               {portfolio.map((item, index) => {
+//                 const currentCoin = currentPrices[item.coinId];
+//                 const currentPrice = currentCoin?.current_price || 0;
+//                 const currentValue = item.amount * currentPrice;
+//                 const purchaseValue = item.amount * item.purchasePrice;
+//                 const pnl = currentValue - purchaseValue;
+//                 const pnlPercentage = purchaseValue > 0 ? (pnl / purchaseValue) * 100 : 0;
+
+//                 return (
+//                   <motion.div
+//                     key={item.coinId}
+//                     initial={{ opacity: 0, y: 20 }}
+//                     animate={{ opacity: 1, y: 0 }}
+//                     transition={{ delay: index * 0.1 }}
+//                     className="p-6 bg-white/10 dark:bg-gray-800/10 backdrop-blur-lg rounded-xl border border-white/20 dark:border-gray-700/20 hover:border-purple-500/30 transition-all duration-300"
+//                   >
+//                     <div className="flex items-center justify-between">
+//                       <div className="flex items-center space-x-4">
+//                         <img
+//                           src={item.image.large}
+//                           alt={item.name}
+//                           className="w-12 h-12 rounded-full"
+//                         />
+//                         <div>
+//                           <h3 className="text-xl font-semibold text-gray-900 dark:text-white">
+//                             {item.name}
+//                           </h3>
+//                           <p className="text-gray-500 dark:text-gray-400 uppercase">
+//                             {item.symbol}
+//                           </p>
+//                         </div>
+//                       </div>
+
+//                       <div className="flex items-center space-x-4">
+//                         <div className="text-right">
+//                           <div className="flex items-center space-x-2">
+//                             {editingItem === item.coinId ? (
+//                               <div className="flex items-center space-x-2">
+//                                 <input
+//                                   type="number"
+//                                   value={editAmount}
+//                                   onChange={(e) => setEditAmount(e.target.value)}
+//                                   className="w-24 px-2 py-1 bg-white/20 dark:bg-gray-800/20 border border-white/30 dark:border-gray-600/30 rounded text-gray-900 dark:text-white text-sm"
+//                                   step="0.00000001"
+//                                 />
+//                                 <button
+//                                   onClick={() => handleSaveAmount(item.coinId)}
+//                                   className="text-green-500 hover:text-green-600 transition-colors"
+//                                 >
+//                                   ✓
+//                                 </button>
+//                                 <button
+//                                   onClick={() => setEditingItem(null)}
+//                                   className="text-red-500 hover:text-red-600 transition-colors"
+//                                 >
+//                                   ✕
+//                                 </button>
+//                               </div>
+//                             ) : (
+//                               <>
+//                                 <span className="text-lg font-semibold text-gray-900 dark:text-white">
+//                                   {item.amount} {item.symbol.toUpperCase()}
+//                                 </span>
+//                                 <button
+//                                   onClick={() => handleEditAmount(item.coinId, item.amount)}
+//                                   className="text-gray-500 hover:text-purple-500 transition-colors"
+//                                 >
+//                                   <Edit2 className="w-4 h-4" />
+//                                 </button>
+//                               </>
+//                             )}
+//                           </div>
+//                           <p className="text-sm text-gray-500 dark:text-gray-400">
+//                             Avg. {formatCurrency(item.purchasePrice)}
+//                           </p>
+//                         </div>
+
+//                         <div className="text-right">
+//                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+//                             {formatCurrency(currentValue)}
+//                           </p>
+//                           <div className={`text-sm ${getChangeColor(pnl)}`}>
+//                             {formatCurrency(pnl)} ({formatPercentage(pnlPercentage)})
+//                           </div>
+//                         </div>
+
+//                         <div className="text-right">
+//                           <p className="text-lg font-semibold text-gray-900 dark:text-white">
+//                             {formatCurrency(currentPrice)}
+//                           </p>
+//                           {currentCoin && (
+//                             <div className={`text-sm ${getChangeColor(currentCoin.price_change_percentage_24h)}`}>
+//                               {formatPercentage(currentCoin.price_change_percentage_24h)}
+//                             </div>
+//                           )}
+//                         </div>
+
+//                         <button
+//                           onClick={() => removeFromPortfolio(item.coinId)}
+//                           className="p-2 text-red-500 hover:text-red-600 hover:bg-red-500/10 rounded-lg transition-colors"
+//                         >
+//                           <Trash2 className="w-5 h-5" />
+//                         </button>
+//                       </div>
+//                     </div>
+//                   </motion.div>
+//                 );
+//               })}
+//             </motion.div>
+//           </>
+//         )}
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Portfolio;
+
+
+
+// export const formatCurrency = (value?: number | null): string => {
+//   if (typeof value !== 'number' || isNaN(value)) {
+//     return '$0.00'; // fallback
+//   }
+
+//   if (value >= 1e12) return `$${(value / 1e12).toFixed(2)}T`;
+//   if (value >= 1e9) return `$${(value / 1e9).toFixed(2)}B`;
+//   if (value >= 1e6) return `$${(value / 1e6).toFixed(2)}M`;
+//   if (value >= 1e3) return `$${(value / 1e3).toFixed(2)}K`;
+
+//   return `$${value.toFixed(2)}`;
+// };
+
+
+// export const formatNumber = (value: number): string => {
+//   if (value >= 1e12) {
+//     return `${(value / 1e12).toFixed(2)}T`;
+//   }
+//   if (value >= 1e9) {
+//     return `${(value / 1e9).toFixed(2)}B`;
+//   }
+//   if (value >= 1e6) {
+//     return `${(value / 1e6).toFixed(2)}M`;
+//   }
+//   if (value >= 1e3) {
+//     return `${(value / 1e3).toFixed(2)}K`;
+//   }
+//   return value.toLocaleString();
+// };
+
+// export const formatPercentage = (value: number): string => {
+//   return `${value >= 0 ? '+' : ''}${value.toFixed(2)}%`;
+// };
+
+// export const formatDate = (dateString: string): string => {
+//   return new Date(dateString).toLocaleDateString('en-US', {
+//     year: 'numeric',
+//     month: 'short',
+//     day: 'numeric',
+//   });
+// };
+
+// export const getChangeColor = (change: number): string => {
+//   return change >= 0 ? 'text-green-400' : 'text-red-400';
+// };
+
+// export const getChangeColorBg = (change: number): string => {
+//   return change >= 0 ? 'bg-green-500/20' : 'bg-red-500/20';
+// };
+
+
+// import React from 'react';
+// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// import { ThemeProvider } from './context/ThemeContext';
+// import { PortfolioProvider } from './context/PortfolioContext';
+// import Layout from './components/Layout/Layout';
+// import Home from './pages/Home';
+// import Market from './pages/Market';
+// import CoinDetail from './pages/CoinDetail';
+// import Portfolio from './pages/Portfolio';
+// import NotFound from './pages/NotFound';
+
+// function App() {
+//   return (
+//     <ThemeProvider>
+//       <PortfolioProvider>
+//         <Router>
+//           <Routes>
+//             <Route path="/" element={<Layout />}>
+//               <Route index element={<Home />} />
+//               <Route path="market" element={<Market />} />
+//               <Route path="coin/:id" element={<CoinDetail />} />
+//               <Route path="portfolio" element={<Portfolio />} />
+//               <Route path="*" element={<NotFound />} />
+//             </Route>
+//           </Routes>
+//         </Router>
+//       </PortfolioProvider>
+//     </ThemeProvider>
+//   );
+// }
+
+// export default App;
+
+

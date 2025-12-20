@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowLeft, TrendingUp, TrendingDown, Star, Plus, ExternalLink, Calendar } from 'lucide-react';
+import { ArrowLeft, TrendingUp, TrendingDown, Star, Plus, ExternalLink } from 'lucide-react';
 import { CoinDetail as CoinDetailType, PriceData } from '../types';
 import { fetchCoinDetail, fetchCoinHistory } from '../utils/api';
 import { formatCurrency, formatPercentage, getChangeColor, formatDate } from '../utils/formatters';
@@ -49,7 +49,7 @@ const CoinDetail: React.FC = () => {
         coinId: coin.id,
         symbol: coin.symbol,
         name: coin.name,
-        image: coin.image,
+        image: coin.image.large,
         amount: 0,
         purchasePrice: coin.current_price,
       });
@@ -107,7 +107,7 @@ const CoinDetail: React.FC = () => {
         >
           <div className="flex items-center space-x-4 mb-4 lg:mb-0">
             <img
-              src={coin.image}
+              src={coin.image.large}
               alt={coin.name}
               className="w-16 h-16 rounded-full"
             />

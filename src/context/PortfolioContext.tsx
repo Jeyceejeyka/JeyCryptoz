@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext } from 'react';
 import { PortfolioItem } from '../types';
 import { useLocalStorage } from '../hooks/useLocalStorage';
@@ -8,6 +9,7 @@ interface PortfolioContextType {
   removeFromPortfolio: (coinId: string) => void;
   updatePortfolioItem: (coinId: string, updates: Partial<PortfolioItem>) => void;
   isInPortfolio: (coinId: string) => boolean;
+  clearPortfolio: () => void; // Add this line
 }
 
 const PortfolioContext = createContext<PortfolioContextType | undefined>(undefined);
@@ -24,7 +26,6 @@ interface PortfolioProviderProps {
   children: React.ReactNode;
 }
 
-// PortfolioProvider component to manage portfolio state
 export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }) => {
   const [portfolio, setPortfolio] = useLocalStorage<PortfolioItem[]>('portfolio', []);
 
@@ -50,6 +51,10 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }
     return portfolio.some(item => item.coinId === coinId);
   };
 
+  const clearPortfolio = () => {
+    setPortfolio([]);
+  };
+
   return (
     <PortfolioContext.Provider value={{
       portfolio,
@@ -57,6 +62,7 @@ export const PortfolioProvider: React.FC<PortfolioProviderProps> = ({ children }
       removeFromPortfolio,
       updatePortfolioItem,
       isInPortfolio,
+      clearPortfolio, // Add this line
     }}>
       {children}
     </PortfolioContext.Provider>
