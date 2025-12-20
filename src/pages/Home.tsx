@@ -18,8 +18,8 @@ const Home: React.FC = () => {
       try {
         const coins = await fetchCoins(1, 50);
         setTopCoins(coins.slice(0, 4));
-        setGainers(coins.filter(coin => coin.price_change_percentage_24h > 0).slice(0, 3));
-        setLosers(coins.filter(coin => coin.price_change_percentage_24h < 0).slice(0, 3));
+        setGainers((Array.isArray(coins) ? coins : []).filter(coin => coin.price_change_percentage_24h > 0).slice(0, 3));
+        setLosers((Array.isArray(coins) ? coins : []).filter(coin => coin.price_change_percentage_24h < 0).slice(0, 3));
       } catch (error) {
         console.error('Error loading data:', error);
       } finally {
